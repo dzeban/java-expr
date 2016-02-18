@@ -1,4 +1,4 @@
-/* 
+/*
 Copyright 2016 Alex Dzyoba <alex@dzyoba.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,27 +16,27 @@ limitations under the License.
 
 package com.dzyoba.expr;
 
+import java.util.Stack;
+import java.util.Collection;
+
 /**
- * jexpr application launcher
- *
+ * Expression parser and evaluator
  */
-public class App 
+public class Expression
 {
-    private static String concatenateArgs(String[] args)
+    Stack<Token> operands = new Stack<Token>();
+    Stack<Token> operators = new Stack<Token>();
+
+    /**
+     * Expression constructor does parsing
+     * @param exp String with arithmetic expression
+     */
+    public Expression(String exp)
     {
-        String expression = "";
-        for(String s : args)
+        Collection<Token> tokens = TokenBuilder.parse(exp);
+        for (Token t : tokens)
         {
-            expression += s;
+            System.out.println(t);
         }
-        return expression;
-    }
-
-    public static void main( String[] args )
-    {
-        String str = concatenateArgs(args);
-        System.out.println(str);
-
-        Expression expr = new Expression(str);
     }
 }
