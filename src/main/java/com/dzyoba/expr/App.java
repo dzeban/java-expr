@@ -38,5 +38,6 @@ public class App
         System.out.println(str);
 
         Expression expr = new Expression(str);
+        System.out.println(expr.evaluate());
     }
 }

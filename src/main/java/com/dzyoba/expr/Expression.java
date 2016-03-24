@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.dzyoba.expr;
 
+import java.util.IllegalFormatException;
 import java.util.Stack;
 import java.util.Collection;
 
@@ -24,8 +25,8 @@ import java.util.Collection;
  */
 public class Expression
 {
-    Stack<Token> operands = new Stack<Token>();
-    Stack<Token> operators = new Stack<Token>();
+    Stack<Operand> operands = new Stack<>();
+    Stack<Operator> operators = new Stack<>();
 
     /**
      * Expression constructor does parsing
@@ -36,7 +37,48 @@ public class Expression
         Collection<Token> tokens = TokenBuilder.parse(exp);
         for (Token t : tokens)
         {
-            System.out.println(t);
+            switch (t.type)
+            {
+                case OPERAND:
+                    operands.push((Operand)t);
+                    break;
+                case OPERATOR:
+                    operators.push((Operator)t);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid token " + t);
+            }
         }
     }
+
+    public double evaluate()
+    {
+        // Temp stacks that we need
+        // because of operator precedence
+        Stack<Operand> ns = new Stack<>();
+        Stack<Operator> ts = new Stack<>();
+
+        do{
+            if (!operands.isEmpty())
+                ns.push(operands.pop());
+
+            if (!operators.isEmpty())
+                ts.push(operators.pop());
+
+            // If next operator has higher precedence
+            if (operators.peek().compareTo(ts.peek()) > 0)
+                continue;
+
+            Operand op1, op2, result;
+            op1 = operands.pop();
+            op2 = ns.pop();
+
+            result = op1.applyOperator(ts.pop(), op2);
+            operands.push(result);
+
+        } while(!ns.empty() && !ts.empty());
+
+        return operands.pop().value;
+    }
+
 }
