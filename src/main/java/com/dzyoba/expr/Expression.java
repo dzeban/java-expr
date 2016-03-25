@@ -16,17 +16,15 @@ limitations under the License.
 
 package com.dzyoba.expr;
 
-import java.util.EmptyStackException;
-import java.util.Stack;
-import java.util.Collection;
+import java.util.*;
 
 /**
  * Expression parser and evaluator
  */
 public class Expression
 {
-    Stack<Number> numbers = new Stack<>();
-    Stack<Operator> operators = new Stack<>();
+    /** expression in a reversed polish notation */
+    private Collection<Token> expression;
 
     /**
      * Expression constructor does parsing
@@ -35,51 +33,83 @@ public class Expression
     public Expression(String exp)
     {
         Collection<Token> tokens = TokenBuilder.parse(exp);
+        expression = convertToRPN(tokens);
+    }
+
+    private Collection<Token> convertToRPN(Collection<Token> tokens)
+    {
+        Collection<Token> output = new LinkedList<>();
+        Stack<Token> stack = new Stack<>();
+
         for (Token t : tokens)
         {
             switch (t.type)
             {
-                case OPERAND:
-                    numbers.push((Number)t);
+                case NUMBER:
+                    output.add(t);
                     break;
                 case OPERATOR:
-                    operators.push((Operator)t);
+                    while (!stack.empty())
+                    {
+                        Operator op_cur = (Operator)t;
+                        Operator op_on_stack = (Operator)stack.peek();
+
+                        boolean left_assoc_cond = op_cur.getAssociativity() == ASSOCIATIVITY.LEFT &&
+                                                  op_cur.compareTo(op_on_stack) <= 0;
+
+                        boolean right_assoc_cond = op_cur.getAssociativity() == ASSOCIATIVITY.RIGHT &&
+                                                   op_cur.compareTo(op_on_stack) < 0;
+
+                        if (left_assoc_cond || right_assoc_cond)
+                            output.add(stack.pop());
+                        else
+                            break;
+                    }
+                    stack.push(t);
                     break;
                 default:
-                    throw new IllegalArgumentException("Invalid token " + t);
+                    throw new IllegalArgumentException("Unknwon token " + t);
             }
         }
+
+        while (!stack.empty())
+            output.add(stack.pop());
+
+        return output;
     }
 
     public double evaluate()
     {
-        while (!operators.empty())
+        Stack<Token> stack = new Stack<>();
+
+        for (Token t : expression)
         {
-            Operator op;
-            Number operand1, operand2, result;
-
-            op = operators.pop();
-            try
+            switch (t.type)
             {
-                operand2 = numbers.pop();
-                operand1 = numbers.pop();
+                case NUMBER:
+                    stack.push(t);
+                    break;
+                case OPERATOR:
+                    Operator op = (Operator)t;
+                    Number n1, n2;
+                    try
+                    {
+                        n2 = (Number) stack.pop();
+                        n1 = (Number) stack.pop();
+                        stack.push(n1.applyOperator(op, n2));
+                    }
+                    catch (EmptyStackException e)
+                    {
+                        throw new IllegalArgumentException("Invalid expression");
+                    }
             }
-            catch (EmptyStackException e)
-            {
-                throw new IllegalArgumentException("Invalid (unbalanced) expression");
-            }
-
-            result = operand1.applyOperator(op, operand2);
-            numbers.push(result);
         }
 
-        // If we evaluated all operators, but some operands left,
-        // that's an invalid expression
-        if (numbers.size() != 1)
+        if (stack.size() != 1)
         {
-            throw new IllegalArgumentException("Invalid (unbalanced) expression");
+            throw new IllegalArgumentException("Invalid expression");
         }
 
-        return numbers.pop().getValue();
+        return ((Number)stack.pop()).getValue();
     }
 }

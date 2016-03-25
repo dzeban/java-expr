@@ -10,13 +10,13 @@ public class Number extends Token
 
     public Number(String s)
     {
-        type = TokenType.OPERAND;
+        type = TokenType.NUMBER;
         value = Double.parseDouble(s);
     }
 
     public Number(double d)
     {
-        type = TokenType.OPERAND;
+        type = TokenType.NUMBER;
         value = d;
     }
 
@@ -46,6 +46,12 @@ public class Number extends Token
                 break;
             case SUB:
                 result = value - other.getValue();
+                break;
+            case MUL:
+                result = value * other.getValue();
+                break;
+            case DIV:
+                result = value / other.getValue();
                 break;
             default:
                 throw new IllegalArgumentException("Invalid operator " + operator.operator);

@@ -2,7 +2,7 @@ package com.dzyoba.expr;
 
 public enum TokenType
 {
-    OPERAND,
+    NUMBER,
     OPERATOR,
     UNKNOWN
 }
