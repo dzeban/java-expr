@@ -10,7 +10,7 @@ public class TokenBuilder
 {
     public static Collection<Token> parse(String exp)
     {
-        Collection<Token> tokens = new LinkedList<Token>();
+        Collection<Token> tokens = new LinkedList<>();
         StringBuilder tokenBuilder = new StringBuilder();
 
         for (Character current : exp.toCharArray())
@@ -27,7 +27,7 @@ public class TokenBuilder
                 if (Character.isDigit(last) && !Character.isDigit(current))
                 {
                     // Token is ready
-                    tokens.add(new Operand(tokenBuilder.toString()));
+                    tokens.add(new Number(tokenBuilder.toString()));
                     // Reset builder
                     tokenBuilder = new StringBuilder();
                 }
@@ -53,7 +53,7 @@ public class TokenBuilder
         // Insert last token
         if (Character.isDigit(tokenBuilder.charAt(0)))
         {
-            tokens.add(new Operand(tokenBuilder.toString()));
+            tokens.add(new Number(tokenBuilder.toString()));
         }
         else
         {

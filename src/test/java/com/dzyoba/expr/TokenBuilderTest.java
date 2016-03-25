@@ -11,11 +11,11 @@ public class TokenBuilderTest extends TestCase {
     {
         String expr = "1+2+3";
         Collection<Token> expected = new LinkedList<>();
-        expected.add(new Operand("1"));
+        expected.add(new Number("1"));
         expected.add(new Operator("+"));
-        expected.add(new Operand("2"));
+        expected.add(new Number("2"));
         expected.add(new Operator("+"));
-        expected.add(new Operand("3"));
+        expected.add(new Number("3"));
 
         Collection<Token> tokens = TokenBuilder.parse(expr);
         assertEquals(expected, tokens);

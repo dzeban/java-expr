@@ -2,18 +2,18 @@ package com.dzyoba.expr;
 
 import junit.framework.TestCase;
 
-public class OperandTest extends TestCase
+public class NumberTest extends TestCase
 {
     public void testSimple()
     {
-        Operand o = new Operand("123");
-        // Operand internal representation is double
+        Number o = new Number("123");
+        // Number internal representation is double
         assertEquals("123.0", o.toString());
     }
 
     public void testDouble()
     {
-        Operand o = new Operand("123.45");
+        Number o = new Number("123.45");
         assertEquals("123.45", o.toString());
     }
 
@@ -21,7 +21,7 @@ public class OperandTest extends TestCase
     {
         boolean thrown = false;
         try {
-            Operand o = new Operand("123a");
+            Number o = new Number("123a");
         } catch (NumberFormatException e) {
             thrown = true;
         }

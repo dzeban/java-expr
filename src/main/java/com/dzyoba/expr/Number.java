@@ -2,19 +2,19 @@ package com.dzyoba.expr;
 
 
 /**
- * Operand token
+ * Number token
  */
-public class Operand extends Token
+public class Number extends Token
 {
-    public double value;
+    private double value;
 
-    public Operand(String s)
+    public Number(String s)
     {
         type = TokenType.OPERAND;
         value = Double.parseDouble(s);
     }
 
-    public Operand(double d)
+    public Number(double d)
     {
         type = TokenType.OPERAND;
         value = d;
@@ -23,35 +23,34 @@ public class Operand extends Token
     @Override
     public String toString() { return String.valueOf(value); }
 
+    public double getValue()
+    {
+        return value;
+    }
+
     @Override
     public boolean equals(Object o)
     {
-        Operand op = (Operand)o;
+        Number op = (Number)o;
         return this.value == op.value;
     }
 
-    public Operand applyOperator(Operator operator, Operand other)
+    public Number applyOperator(Operator operator, Number other)
     {
         double result;
 
         switch (operator.operator)
         {
             case ADD:
-                result = value + other.value;
+                result = value + other.getValue();
                 break;
             case SUB:
-                result = value - other.value;
-                break;
-            case MUL:
-                result = value * other.value;
-                break;
-            case DIV:
-                result = value / other.value;
+                result = value - other.getValue();
                 break;
             default:
                 throw new IllegalArgumentException("Invalid operator " + operator.operator);
         }
 
-        return new Operand(result);
+        return new Number(result);
     }
 }

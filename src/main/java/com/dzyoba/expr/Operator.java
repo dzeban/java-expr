@@ -3,11 +3,10 @@ package com.dzyoba.expr;
 /**
  * Operator token
  */
-public class Operator extends Token implements Comparable<Operator>
+public class Operator extends Token
 {
-    public char operator_char;
-    public OP operator;
-    public short precedence;
+    public char symbol;
+    public OPERATOR operator;
 
 
     public Operator(String s)
@@ -17,30 +16,20 @@ public class Operator extends Token implements Comparable<Operator>
         switch (s)
         {
             case "+":
-                operator = OP.ADD;
-                precedence = 0;
+                operator = OPERATOR.ADD;
                 break;
             case "-":
-                operator = OP.SUB;
-                precedence = 0;
-                break;
-            case "*":
-                operator = OP.MUL;
-                precedence = 1;
-                break;
-            case "/":
-                operator = OP.DIV;
-                precedence = 1;
+                operator = OPERATOR.SUB;
                 break;
             default:
                 throw new UnsupportedOperationException("Unsupported operator " + s);
         }
 
-        operator_char = s.charAt(0);
+        symbol = s.charAt(0);
     }
 
     @Override
-    public String toString() { return String.valueOf(operator_char); }
+    public String toString() { return String.valueOf(symbol); }
 
     @Override
     public boolean equals(Object o)
@@ -48,15 +37,10 @@ public class Operator extends Token implements Comparable<Operator>
         Operator op = (Operator) o;
         return this.operator == op.operator;
     }
-
-    public int compareTo(Operator other)
-    {
-        return precedence - other.precedence;
-    }
 }
 
-enum OP
+enum OPERATOR
 {
-    ADD, SUB, MUL, DIV
+    ADD, SUB
 }
 

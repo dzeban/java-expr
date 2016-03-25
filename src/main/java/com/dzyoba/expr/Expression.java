@@ -16,7 +16,7 @@ limitations under the License.
 
 package com.dzyoba.expr;
 
-import java.util.IllegalFormatException;
+import java.util.EmptyStackException;
 import java.util.Stack;
 import java.util.Collection;
 
@@ -25,7 +25,7 @@ import java.util.Collection;
  */
 public class Expression
 {
-    Stack<Operand> operands = new Stack<>();
+    Stack<Number> numbers = new Stack<>();
     Stack<Operator> operators = new Stack<>();
 
     /**
@@ -40,7 +40,7 @@ public class Expression
             switch (t.type)
             {
                 case OPERAND:
-                    operands.push((Operand)t);
+                    numbers.push((Number)t);
                     break;
                 case OPERATOR:
                     operators.push((Operator)t);
@@ -53,32 +53,33 @@ public class Expression
 
     public double evaluate()
     {
-        // Temp stacks that we need
-        // because of operator precedence
-        Stack<Operand> ns = new Stack<>();
-        Stack<Operator> ts = new Stack<>();
+        while (!operators.empty())
+        {
+            Operator op;
+            Number operand1, operand2, result;
 
-        do{
-            if (!operands.isEmpty())
-                ns.push(operands.pop());
+            op = operators.pop();
+            try
+            {
+                operand2 = numbers.pop();
+                operand1 = numbers.pop();
+            }
+            catch (EmptyStackException e)
+            {
+                throw new IllegalArgumentException("Invalid (unbalanced) expression");
+            }
 
-            if (!operators.isEmpty())
-                ts.push(operators.pop());
+            result = operand1.applyOperator(op, operand2);
+            numbers.push(result);
+        }
 
-            // If next operator has higher precedence
-            if (operators.peek().compareTo(ts.peek()) > 0)
-                continue;
+        // If we evaluated all operators, but some operands left,
+        // that's an invalid expression
+        if (numbers.size() != 1)
+        {
+            throw new IllegalArgumentException("Invalid (unbalanced) expression");
+        }
 
-            Operand op1, op2, result;
-            op1 = operands.pop();
-            op2 = ns.pop();
-
-            result = op1.applyOperator(ts.pop(), op2);
-            operands.push(result);
-
-        } while(!ns.empty() && !ts.empty());
-
-        return operands.pop().value;
+        return numbers.pop().getValue();
     }
-
 }
