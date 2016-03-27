@@ -21,46 +21,45 @@ import java.util.*;
 /**
  * Expression parser and evaluator
  */
-public class Expression
-{
-    /** expression in a reversed polish notation */
-    private Collection<Token> expression;
+class Expression {
+    /**
+     * expression in a reversed polish notation
+     */
+    private final Collection<Token> expression;
 
     /**
      * Expression constructor does parsing
+     *
      * @param exp String with arithmetic expression
      */
-    public Expression(String exp)
-    {
+    public Expression(String exp) {
         Collection<Token> tokens = TokenBuilder.parse(exp);
         expression = convertToRPN(tokens);
     }
 
-    private Collection<Token> convertToRPN(Collection<Token> tokens)
-    {
+    private Collection<Token> convertToRPN(Collection<Token> tokens) {
         Collection<Token> output = new LinkedList<>();
         Stack<Token> stack = new Stack<>();
 
-        for (Token t : tokens)
-        {
-            switch (t.type)
-            {
+        for (Token t : tokens) {
+            switch (t.tokenType) {
                 case NUMBER:
                     output.add(t);
                     break;
                 case OPERATOR:
-                    while (!stack.empty())
-                    {
-                        Operator op_cur = (Operator)t;
-                        Operator op_on_stack = (Operator)stack.peek();
+                    while (!stack.empty()) {
+                        Operator opCur = (Operator) t;
+                        Operator opOnStack = (Operator) stack.peek();
 
-                        boolean left_assoc_cond = op_cur.getAssociativity() == ASSOCIATIVITY.LEFT &&
-                                                  op_cur.compareTo(op_on_stack) <= 0;
+                        boolean precedenceLeftCond =
+                                opCur.getAssociativity() == Associativity.LEFT
+                                && opCur.compareTo(opOnStack) <= 0;
 
-                        boolean right_assoc_cond = op_cur.getAssociativity() == ASSOCIATIVITY.RIGHT &&
-                                                   op_cur.compareTo(op_on_stack) < 0;
+                        boolean precedenceRightCond =
+                                opCur.getAssociativity() == Associativity.RIGHT
+                                && opCur.compareTo(opOnStack) < 0;
 
-                        if (left_assoc_cond || right_assoc_cond)
+                        if (precedenceLeftCond || precedenceRightCond)
                             output.add(stack.pop());
                         else
                             break;
@@ -68,7 +67,7 @@ public class Expression
                     stack.push(t);
                     break;
                 default:
-                    throw new IllegalArgumentException("Unknwon token " + t);
+                    throw new IllegalArgumentException("Unknown token " + t);
             }
         }
 
@@ -78,38 +77,32 @@ public class Expression
         return output;
     }
 
-    public double evaluate()
-    {
+    public double evaluate() {
         Stack<Token> stack = new Stack<>();
 
-        for (Token t : expression)
-        {
-            switch (t.type)
-            {
+        for (Token t : expression) {
+            switch (t.tokenType) {
                 case NUMBER:
                     stack.push(t);
                     break;
                 case OPERATOR:
-                    Operator op = (Operator)t;
+                    Operator op = (Operator) t;
                     Number n1, n2;
-                    try
-                    {
+                    try {
                         n2 = (Number) stack.pop();
                         n1 = (Number) stack.pop();
-                        stack.push(n1.applyOperator(op, n2));
-                    }
-                    catch (EmptyStackException e)
-                    {
+
+                        stack.push(op.apply(n1, n2));
+                    } catch (EmptyStackException e) {
                         throw new IllegalArgumentException("Invalid expression");
                     }
             }
         }
 
-        if (stack.size() != 1)
-        {
+        if (stack.size() != 1) {
             throw new IllegalArgumentException("Invalid expression");
         }
 
-        return ((Number)stack.pop()).getValue();
+        return ((Number) stack.pop()).getValue();
     }
 }

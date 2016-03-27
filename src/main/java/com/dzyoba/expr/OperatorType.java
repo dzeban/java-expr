@@ -1,4 +1,4 @@
-/* 
+/*
 Copyright 2016 Alex Dzyoba <alex@dzyoba.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,23 +16,6 @@ limitations under the License.
 
 package com.dzyoba.expr;
 
-/**
- * jexpr application launcher
- */
-class App {
-    private static String concatenateArgs(String[] args) {
-        String expression = "";
-        for (String s : args) {
-            expression += s;
-        }
-        return expression;
-    }
-
-    public static void main(String[] args) {
-        String str = concatenateArgs(args);
-        System.out.println(str);
-
-        Expression expr = new Expression(str);
-        System.out.println(expr.evaluate());
-    }
+public enum OperatorType {
+    ADD, SUB, MUL, DIV
 }

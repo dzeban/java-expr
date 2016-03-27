@@ -7,8 +7,7 @@ import java.util.LinkedList;
 
 public class TokenBuilderTest extends TestCase {
 
-    public void testParse() throws Exception
-    {
+    public void testParse() throws Exception {
         String expr = "1+2+3";
         Collection<Token> expected = new LinkedList<>();
         expected.add(new Number("1"));
