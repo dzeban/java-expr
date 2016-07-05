@@ -50,6 +50,11 @@ class Operator extends Token implements Comparable<Operator> {
                 precedence = 1;
                 associativity = Associativity.LEFT;
                 break;
+            case "^":
+                operatorType = OperatorType.POW;
+                precedence = 2;
+                associativity = Associativity.RIGHT;
+                break;
             default:
                 throw new UnsupportedOperationException("Unsupported operatorType " + s);
         }
@@ -74,6 +79,9 @@ class Operator extends Token implements Comparable<Operator> {
                 break;
             case DIV:
                 result = n1 / n2;
+                break;
+            case POW:
+                result = Math.pow(n1, n2);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid operatorType " + operatorType);

@@ -23,6 +23,11 @@ public class OperatorTest extends TestCase {
         assertEquals("/", o.toString());
     }
 
+    public void testPow() {
+        Operator o = new Operator("^");
+        assertEquals("^", o.toString());
+    }
+
     public void testUnsupported() {
         boolean thrown = false;
         try {

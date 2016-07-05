@@ -17,5 +17,5 @@ limitations under the License.
 package com.dzyoba.expr;
 
 public enum OperatorType {
-    ADD, SUB, MUL, DIV
+    ADD, SUB, MUL, DIV, POW
 }

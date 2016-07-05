@@ -21,6 +21,11 @@ public class ExpressionTest extends TestCase {
         assertEquals(-2.0, expr.evaluate());
     }
 
+    public void testPow() throws Exception {
+        Expression expr = new Expression("2 * 3^2^1 / 6");
+        assertEquals(3.0, expr.evaluate());
+    }
+
     public void testInvalidExpr() throws Exception {
         boolean thrown = false;
         Expression expr = new Expression("1+2+");
