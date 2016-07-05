@@ -39,7 +39,7 @@ class Expression {
 
     private Collection<Token> convertToRPN(Collection<Token> tokens) {
         Collection<Token> output = new LinkedList<>();
-        Stack<Token> stack = new Stack<>();
+        Stack<Operator> stack = new Stack<>();
 
         for (Token t : tokens) {
             switch (t.tokenType) {
@@ -47,30 +47,52 @@ class Expression {
                     output.add(t);
                     break;
                 case OPERATOR:
+                    Operator opCur = (Operator) t;
+
+                    // For ')' we pop everything until '('
+                    // and continue to the next token
+                    if (opCur.type == OperatorType.RBRACE) {
+                        try {
+                            Operator op = stack.pop();
+                            while (op.type != OperatorType.LBRACE) {
+                                output.add(op);
+                                op = stack.pop();
+                            }
+                        } catch (EmptyStackException e) {
+                            throw new IllegalArgumentException("Unbalanced parenthesis");
+                        }
+                        continue; // Avoid pushing RBRACE on the stack
+                    }
+
+                    // Pop operators with higher precedence
                     while (!stack.empty()) {
-                        Operator opCur = (Operator) t;
-                        Operator opOnStack = (Operator) stack.peek();
+                        Operator opOnStack = stack.peek();
 
                         boolean precedenceLeftCond =
                                 opCur.getAssociativity() == Associativity.LEFT
-                                && opCur.compareTo(opOnStack) <= 0;
+                                && opCur.compareTo(opOnStack) <= 0
+                                && opOnStack.type != OperatorType.LBRACE;
 
                         boolean precedenceRightCond =
                                 opCur.getAssociativity() == Associativity.RIGHT
-                                && opCur.compareTo(opOnStack) < 0;
+                                && opCur.compareTo(opOnStack) < 0
+                                && opOnStack.type != OperatorType.LBRACE;
 
                         if (precedenceLeftCond || precedenceRightCond)
                             output.add(stack.pop());
                         else
                             break;
                     }
-                    stack.push(t);
+
+                    // Operators are pushed to the stack
+                    stack.push(opCur);
                     break;
                 default:
                     throw new IllegalArgumentException("Unknown token " + t);
             }
         }
 
+        // Pop remained operators
         while (!stack.empty())
             output.add(stack.pop());
 

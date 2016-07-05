@@ -20,7 +20,7 @@ package com.dzyoba.expr;
  * Operator token
  */
 class Operator extends Token implements Comparable<Operator> {
-    private OperatorType operatorType;
+    public OperatorType type;
 
     private char symbol;
     private int precedence;
@@ -31,32 +31,42 @@ class Operator extends Token implements Comparable<Operator> {
 
         switch (s) {
             case "+":
-                operatorType = OperatorType.ADD;
+                type = OperatorType.ADD;
                 precedence = 0;
                 associativity = Associativity.LEFT;
                 break;
             case "-":
-                operatorType = OperatorType.SUB;
+                type = OperatorType.SUB;
                 precedence = 0;
                 associativity = Associativity.LEFT;
                 break;
             case "*":
-                operatorType = OperatorType.MUL;
+                type = OperatorType.MUL;
                 precedence = 1;
                 associativity = Associativity.LEFT;
                 break;
             case "/":
-                operatorType = OperatorType.DIV;
+                type = OperatorType.DIV;
                 precedence = 1;
                 associativity = Associativity.LEFT;
                 break;
             case "^":
-                operatorType = OperatorType.POW;
+                type = OperatorType.POW;
                 precedence = 2;
                 associativity = Associativity.RIGHT;
                 break;
+            case "(":
+                type = OperatorType.LBRACE;
+                precedence = 10;
+                associativity = Associativity.RIGHT;
+                break;
+            case ")":
+                type = OperatorType.RBRACE;
+                precedence = 10;
+                associativity = Associativity.RIGHT;
+                break;
             default:
-                throw new UnsupportedOperationException("Unsupported operatorType " + s);
+                throw new UnsupportedOperationException("Unsupported type " + s);
         }
 
         symbol = s.charAt(0);
@@ -67,7 +77,7 @@ class Operator extends Token implements Comparable<Operator> {
         double n1 = number1.getValue();
         double n2 = number2.getValue();
 
-        switch (operatorType) {
+        switch (type) {
             case ADD:
                 result = n1 + n2;
                 break;
@@ -84,7 +94,7 @@ class Operator extends Token implements Comparable<Operator> {
                 result = Math.pow(n1, n2);
                 break;
             default:
-                throw new IllegalArgumentException("Invalid operatorType " + operatorType);
+                throw new IllegalArgumentException("Invalid type " + type);
         }
 
         return new Number(result);
@@ -103,7 +113,7 @@ class Operator extends Token implements Comparable<Operator> {
             return false;
         } else {
             Operator op = (Operator) o;
-            return this.operatorType == op.operatorType;
+            return this.type == op.type;
         }
     }
 

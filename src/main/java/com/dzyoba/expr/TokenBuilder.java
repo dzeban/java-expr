@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.dzyoba.expr;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -24,48 +25,33 @@ import java.util.LinkedList;
  */
 class TokenBuilder {
     public static Collection<Token> parse(String exp) {
-        Collection<Token> tokens = new LinkedList<>();
-        StringBuilder tokenBuilder = new StringBuilder();
+        Collection<Token> tokens = new ArrayList<>();
 
-        for (Character current : exp.toCharArray()) {
-            if (Character.isSpaceChar(current))
-                continue;
+        char[] expChars = exp.toCharArray();
+        for (int i = 0; i < expChars.length; i++) {
+            if (Character.isDigit(expChars[i])) {
+                StringBuilder numberBuilder = new StringBuilder();
+                do {
+                    numberBuilder.append(expChars[i]);
+                    ++i;
+                    if (i == expChars.length) {
+                        break;
+                    }
+                } while(Character.isDigit(expChars[i]));
 
-            int length = tokenBuilder.length();
-            if (length != 0) {
-                char last = tokenBuilder.charAt(length - 1);
-
-                // End of number
-                if (Character.isDigit(last) && !Character.isDigit(current)) {
-                    // Token is ready
-                    tokens.add(new Number(tokenBuilder.toString()));
-                    // Reset builder
-                    tokenBuilder = new StringBuilder();
-                }
-                // End of operatorType
-                else if (!Character.isDigit(last) && Character.isDigit(current)) {
-                    // Token is ready
-                    tokens.add(new Operator(tokenBuilder.toString()));
-                    // Reset builder
-                    tokenBuilder = new StringBuilder();
-                }
-                // The only valid case left is several consecutive digits that must be accumulated
-                // in builder, that's what we do on every iteration (see append below)
-                else if (!(Character.isDigit(last) && Character.isDigit(current))) {
-                    throw new IllegalArgumentException("Parsing failure: Invalid expression");
-                }
+                tokens.add(new Number(numberBuilder.toString()));
             }
 
-            tokenBuilder.append(current);
-        }
+            if (i == expChars.length) {
+                break;
+            }
 
-        // Insert last token
-        if (Character.isDigit(tokenBuilder.charAt(0))) {
-            tokens.add(new Number(tokenBuilder.toString()));
-        } else {
-            tokens.add(new Operator(tokenBuilder.toString()));
-        }
+            if (Character.isSpaceChar(expChars[i])) {
+                continue;
+            }
 
+            tokens.add(new Operator(String.valueOf(expChars[i])));
+        }
         return tokens;
     }
 }
